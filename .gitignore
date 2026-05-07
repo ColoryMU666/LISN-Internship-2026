@@ -1,0 +1,18 @@
+# Python-generated files
+testDocker/__pycache__/
+testDocker/*.py[oc]
+testDocker/build/
+testDocker/dist/
+testDocker/wheels/
+testDocker/*.egg-info
+
+testFastAPI/__pycache__/
+testFastAPI/*.py[oc]
+testFastAPI/build/
+testFastAPI/dist/
+testFastAPI/wheels/
+testFastAPI/*.egg-info
+
+# Virtual environments
+testDocker/.venv
+testFastAPI/.venv

@@ -1,10 +1,7 @@
-FROM python:3.12-slim
-
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+FROM ghcr.io/astral-sh/uv:alpine
 
 RUN uv pip install --system requests
 
 WORKDIR /app
 
-RUN uv init
-RUN uv add pandas
+CMD [ "bash" ]

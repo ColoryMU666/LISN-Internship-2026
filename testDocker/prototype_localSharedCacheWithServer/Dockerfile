@@ -4,11 +4,14 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 RUN uv pip install --system requests
 
-WORKDIR /app
+RUN useradd -m -u 1000 appuser
 
-RUN uv init
-RUN uv add pandas
+WORKDIR /home/appuser/app
 
-COPY requestPackage.py .
+RUN chown -R  appuser:appuser /home/appuser
+
+COPY --chown=appuser:appuser requestPackage.py .
+
+USER appuser
 
 CMD [ "bash" ]

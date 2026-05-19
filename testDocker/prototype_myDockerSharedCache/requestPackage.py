@@ -8,8 +8,8 @@ subprocess.run('uv lock', shell=True)
 subprocess.run('uv export -q -o pylock.toml', shell=True)
 
 try:
-    url = f"http://{sys.argv[1]}:8000/upload/"
-    urlInfo = f"http://{sys.argv[1]}:8000/info/"
+    url = f"{sys.argv[1]}upload/"
+    urlInfo = f"{sys.argv[1]}info/"
 except:
     raise IndexError("The link to the server was not given")
 

@@ -10,7 +10,7 @@ def main():
     packages = []
     stop = False
     while not stop:
-        requestedPackage = input("Please enter the name of the requested package or leave a blank to exit")
+        requestedPackage = input("Please enter the name of the requested package or leave a blank to exit :\n")
         if requestedPackage == "":
             stop = True
         else:
@@ -26,4 +26,4 @@ if __name__=="__main__":
     try:
         main()
     except KeyboardInterrupt as e:
-        pass
+        raise KeyboardInterrupt

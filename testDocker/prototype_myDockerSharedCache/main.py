@@ -6,7 +6,7 @@ BASE_DIR = os.getcwd()
 
 def main():
     subprocess.run(f"uv init {VENV_LOCATION}", shell=True)
-    subprocess.run(f"cd {VENV_LOCATION}", shell=True)
+    os.chdir(f"cd {VENV_LOCATION}", shell=True)
     subprocess.run("ls", shell=True)
     packages = []
     stop = False
@@ -22,7 +22,7 @@ def main():
                 stdout = e.stdout.decode() if e.stdout else "no stdout"
                 print(f"stderr : {stderr}\n stdout : {stdout}")
     subprocess.run("uv lock", shell=True)
-    subprocess.run(f"cd {BASE_DIR}", shell=True)
+    os.chdir(f"cd {BASE_DIR}", shell=True)
 
 if __name__=="__main__":
     try:

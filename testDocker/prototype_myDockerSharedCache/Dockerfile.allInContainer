@@ -1,7 +1,0 @@
-FROM ghcr.io/astral-sh/uv:alpine
-
-RUN uv pip install --system requests
-
-WORKDIR /app
-
-CMD [ "bash" ]

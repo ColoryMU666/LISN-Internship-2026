@@ -5,7 +5,7 @@ VENV_LOCATION = "/tmp/venv/"
 BASE_DIR = os.getcwd()
 
 def main():
-    subprocess.run(f"uv venv {VENV_LOCATION}", shell=True)
+    subprocess.run(f"uv init {VENV_LOCATION}", shell=True)
     subprocess.run(f"cd {VENV_LOCATION}", shell=True)
     packages = []
     stop = False

@@ -43,4 +43,4 @@ def request(lockfile):
     subprocess.run("uv sync --offline", shell=True, check=True)
 
 if __name__ == "__main__":
-    request()
+    pass

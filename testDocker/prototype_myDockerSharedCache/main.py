@@ -1,5 +1,6 @@
 import subprocess
 import os
+import requestPackage
 
 VENV_LOCATION = "/tmp/venv/"
 BASE_DIR = os.getcwd()
@@ -11,7 +12,7 @@ def main():
     packages = []
     stop = False
     while not stop:
-        requestedPackage = input("Please enter the name of the requested package or leave a blank to exit :\n")
+        requestedPackage = input("Please enter the name of the requested package or leave blank to exit :\n")
         if requestedPackage == "":
             stop = True
         else:
@@ -22,10 +23,15 @@ def main():
                 stdout = e.stdout.decode() if e.stdout else "no stdout"
                 print(f"stderr : {stderr}\n stdout : {stdout}")
     subprocess.run("uv lock", shell=True)
+    subprocess.run('uv export -q -o pylock.toml', shell=True)
     os.chdir(f"{BASE_DIR}")
+    requestPackage.request(lockfile={'file': open('pylock.toml', 'r')})
 
 if __name__=="__main__":
     try:
         main()
     except KeyboardInterrupt as e:
-        raise KeyboardInterrupt
+        subprocess.run("uv lock", shell=True)
+        subprocess.run('uv export -q -o pylock.toml', shell=True)
+        os.chdir(f"{BASE_DIR}")
+        print("Ending process properly")

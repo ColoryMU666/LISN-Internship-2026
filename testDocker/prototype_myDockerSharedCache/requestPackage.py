@@ -4,9 +4,7 @@ import subprocess
 import platform
 import sys
 
-def request():
-    subprocess.run('uv lock', shell=True)
-    subprocess.run('uv export -q -o pylock.toml', shell=True)
+def request(lockfile):
 
     try:
         url = f"{sys.argv[1]}upload/"
@@ -32,11 +30,10 @@ def request():
     }
     target_platform = platform_map.get(machine, "x86_64-unknown-linux-gnu")
 
-    files = {'file': open('pylock.toml', 'r')}
     infos = {'file': open('info.txt', 'r')}
 
     requests.post(urlInfo, files=infos)
-    response = requests.post(url, files=files, data={
+    response = requests.post(url, files=lockfile, data={
         "platform": target_platform,
         "python_version": "3.14"
     })

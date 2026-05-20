@@ -24,8 +24,8 @@ def main():
                 print(f"stderr : {stderr}\n stdout : {stdout}")
     subprocess.run("uv lock", shell=True)
     subprocess.run('uv export -q -o pylock.toml', shell=True)
-    os.chdir(f"{BASE_DIR}")
     requestPackage.request(lockfile={'file': open('pylock.toml', 'r')})
+    os.chdir(f"{BASE_DIR}")
 
 if __name__=="__main__":
     try:

@@ -40,7 +40,6 @@ def request(lockfile):
 
     print(response.text)
 
-    # Le cache est déjà monté, on peut directement sync
     subprocess.run("uv sync --offline", shell=True, check=True)
 
 if __name__ == "__main__":

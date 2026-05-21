@@ -1,4 +1,5 @@
 from fastapi import FastAPI, UploadFile, HTTPException, Form
+from fastapi.responses import HTMLResponse
 import shutil
 import os
 import subprocess
@@ -33,6 +34,18 @@ def get_installed_packages():
     file.close()
     return res
 
+@app.get("/", response_class=HTMLResponse)
+async def root():
+    return """
+    <html>
+        <body>
+            <h1>Welcome !</h1>
+            <a href="/info/">
+                <button>View dowloaded packages</button>
+            </a>
+        </body>
+    </html>
+    """
 
 @app.post("/hello/")
 async def helloWorld():

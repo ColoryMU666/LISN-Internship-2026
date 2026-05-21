@@ -11,6 +11,29 @@ BASE_DIR = os.getcwd()
 UV_CACHE_DIR = os.path.expanduser("~/.cache/uv")
 uv_env = {**os.environ, "UV_CACHE_DIR": UV_CACHE_DIR}
 
+def get_installed_packages():
+    readName = False
+    reading = False
+    name = ""
+    res = {}
+    try:
+        file = open("pylock.toml", "r")
+    except:
+        raise OSError("Could not open pylock.toml. Please consider checking if it exists.", res)
+    for line in file:
+        if not readName and reading:
+            res[name] = line[11:-1]
+            reading = False
+        if readName and reading:
+            name = line[8:-1]
+            readName = False
+        if line.startswith("[[packages]]"):
+            readName = True
+            reading = True
+    file.close()
+    return res
+
+
 @app.post("/hello/")
 async def helloWorld():
     return "Hello world"
@@ -27,7 +50,7 @@ async def set_info(file: UploadFile):
 
 @app.get("/info/")
 async def get_info():
-    return {"message": info[0]}
+    return get_installed_packages()
 
 @app.post("/upload/")
 async def sync_pylock(

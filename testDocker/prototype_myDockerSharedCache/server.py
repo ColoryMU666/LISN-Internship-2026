@@ -25,7 +25,7 @@ def get_installed_packages():
             res[name] = line[11:-1]
             reading = False
         if readName and reading:
-            name = line[8:-1]
+            name = line[8:-2]
             readName = False
         if line.startswith("[[packages]]"):
             readName = True

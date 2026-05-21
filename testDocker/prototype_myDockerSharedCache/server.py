@@ -22,7 +22,7 @@ def get_installed_packages():
         raise OSError("Could not open pylock.toml. Please consider checking if it exists.", res)
     for line in file:
         if not readName and reading:
-            res[name] = line[11:-1]
+            res[name] = line[11:-2]
             reading = False
         if readName and reading:
             name = line[8:-2]

@@ -1,0 +1,23 @@
+variables:
+  IMAGE: "${CI_REGISTRY_IMAGE}/image:latest"
+  IMAGE_WITH_VERSION: "${CI_REGISTRY_IMAGE}/image:${CI_COMMIT_SHA}"
+
+build_image:
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  script:
+    - /kaniko/executor
+      --context "${CI_PROJECT_DIR}"
+      --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
+      --destination "${IMAGE_WITH_VERSION}"
+      --destination "${IMAGE}"
+      --cache=true
+      --single-snapshot
+      --snapshot-mode=time
+      --compressed-caching=false
+  only:
+    changes:
+      - .gitlab-ci.yml
+      - Dockerfile
+      - server.py

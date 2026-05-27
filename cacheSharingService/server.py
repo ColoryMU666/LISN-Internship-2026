@@ -16,7 +16,7 @@ def get_installed_packages():
     readName = False
     reading = False
     name = ""
-    res = {}
+    res = {"path" : os.getcwd()}
     try:
         file = open("pylock.toml", "r")
     except:
@@ -54,13 +54,14 @@ async def helloWorld():
 # Change the two following function to support several demands at the same time. Currently if 
 # A, B and C asks for their env and the info request is processed quicker than the upload request 
 # the created venv for B will be named venv_C. It's not much of a problem but it would be better 
-# for clarity and debugging purpose if the venv always have the name of the machinie who requested it.
+# for clarity and debugging purpose if the venv always have the name of the machine who requested it.
 @app.post("/info/")
 async def set_info(file: UploadFile):
     content = await file.read()
     info[0] = content.decode('utf-8').strip()
     return
 
+#This function is temporary and should soon be replaced 
 @app.get("/info/")
 async def get_info():
     return get_installed_packages()

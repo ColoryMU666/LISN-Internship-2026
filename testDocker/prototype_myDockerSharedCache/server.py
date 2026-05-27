@@ -16,7 +16,7 @@ def get_installed_packages():
     readName = False
     reading = False
     name = ""
-    res = {}
+    res = {"path" : os.getcwd()}
     try:
         file = open("pylock.toml", "r")
     except:

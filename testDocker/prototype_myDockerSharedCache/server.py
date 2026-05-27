@@ -77,34 +77,35 @@ async def sync_pylock(
         with open(local_file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
 
-        tmp_venv = f"/tmp/venv_{info[0].strip()}"
-        subprocess.run(
-            f"uv venv --python 3.14 {tmp_venv}",
-            shell=True, check=True, env=uv_env, capture_output=True
-        )
+        #tmp_venv = f"/tmp/venv_{info[0].strip()}"
+        #subprocess.run(
+        #    f"uv venv --python 3.14 {tmp_venv}",
+        #    shell=True, check=True, env=uv_env, capture_output=True
+        #)
+#
+        ## Passe 1 : télécharger et indexer les sdists nativement
+        #subprocess.run(
+        #    f"uv pip install --python {tmp_venv}/bin/python "
+        #    f"--link-mode=copy "
+        #    f"-r pylock.toml",
+        #    shell=True, check=True, capture_output=True, env=uv_env
+        #)
+#
+        ## Passe 2 : installer pour la plateforme cible
+        #subprocess.run(
+        #    f"uv pip install --python {tmp_venv}/bin/python "
+        #    f"--python-platform {platform} "
+        #    f"--python-version {python_version} "
+        #    f"--link-mode=copy "
+        #    f"--reinstall "
+        #    f"-r pylock.toml",
+        #    shell=True, check=True, capture_output=True, env=uv_env
+        #)
+#
+        #subprocess.run(f"rm -rf {tmp_venv}", shell=True)
 
-        # Passe 1 : télécharger et indexer les sdists nativement
-        subprocess.run(
-            f"uv pip install --python {tmp_venv}/bin/python "
-            f"--link-mode=copy "
-            f"-r pylock.toml",
-            shell=True, check=True, capture_output=True, env=uv_env
-        )
-
-        # Passe 2 : installer pour la plateforme cible
-        subprocess.run(
-            f"uv pip install --python {tmp_venv}/bin/python "
-            f"--python-platform {platform} "
-            f"--python-version {python_version} "
-            f"--link-mode=copy "
-            f"--reinstall "
-            f"-r pylock.toml",
-            shell=True, check=True, capture_output=True, env=uv_env
-        )
-
-        subprocess.run(f"rm -rf {tmp_venv}", shell=True)
-
-
+        subprocess.run(f"uv pip install -r pylock.toml", shell=True)
+        
     except subprocess.CalledProcessError as e:
         stderr = e.stderr.decode() if e.stderr else "no stderr"
         stdout = e.stdout.decode() if e.stdout else "no stdout"
@@ -112,4 +113,4 @@ async def sync_pylock(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-    return "/tmp/tosend.zip"
+    return "Done"

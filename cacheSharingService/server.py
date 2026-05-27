@@ -113,4 +113,4 @@ async def sync_pylock(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-    return "/tmp/tosend.zip"
+    return "Done"

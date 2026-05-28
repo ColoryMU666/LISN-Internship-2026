@@ -6,13 +6,17 @@ import subprocess
 from typing import Optional
 
 app = FastAPI()
-info = ["a"]
+info = ["a"] # Pointeur python
 
 BASE_DIR = os.getcwd()
 UV_CACHE_DIR = os.path.expanduser("~/.cache/uv")
 uv_env = {**os.environ, "UV_CACHE_DIR": UV_CACHE_DIR}
 
-def get_installed_packages():
+def get_installed_packages() -> dict[str, str]:
+    '''
+    This function parse the pylock.toml file in the current directory and return a dictionnary where the
+    keys are the name of the package needed and the values are their version.
+    '''
     readName = False
     reading = False
     name = ""
@@ -34,6 +38,8 @@ def get_installed_packages():
     file.close()
     return res
 
+
+#Creates a button on the home page to access the information page.
 @app.get("/", response_class=HTMLResponse)
 async def root():
     return """
@@ -51,7 +57,7 @@ async def root():
 async def helloWorld():
     return "Hello world"
 
-# Change the two following function to support several demands at the same time. Currently if 
+# Change the following function to support several demands at the same time. Currently if 
 # A, B and C asks for their env and the info request is processed quicker than the upload request 
 # the created venv for B will be named venv_C. It's not much of a problem but it would be better 
 # for clarity and debugging purpose if the venv always have the name of the machine who requested it.
@@ -64,7 +70,11 @@ async def set_info(file: UploadFile):
 #This function is temporary and should soon be replaced 
 @app.get("/info/")
 async def get_info():
-    return get_installed_packages()
+    try :
+        return get_installed_packages()
+    except OSError as e:
+        print(e.args[0])
+        return e.args[1]
 
 @app.post("/upload/")
 async def sync_pylock(
@@ -75,16 +85,18 @@ async def sync_pylock(
     local_file_path = os.path.join(BASE_DIR, file.filename)
 
     try:
+        # Copy the content of the posted lockfile into a brand new lockfile in the current directory
         with open(local_file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
 
+        # Creating the temporary venv in which we will be downloading every needed packages
         tmp_venv = f"/tmp/venv_{info[0].strip()}"
         subprocess.run(
             f"uv venv --python 3.14 {tmp_venv}",
             shell=True, check=True, env=uv_env, capture_output=True
         )
 
-        # Passe 1 : télécharger et indexer les sdists nativement
+        # Step 1 : Downloading and indexing the sdist
         subprocess.run(
             f"uv pip install --python {tmp_venv}/bin/python "
             f"--link-mode=copy "
@@ -92,7 +104,7 @@ async def sync_pylock(
             shell=True, check=True, capture_output=True, env=uv_env
         )
 
-        # Passe 2 : installer pour la plateforme cible
+        # Step 2 : Installing for the target platform
         subprocess.run(
             f"uv pip install --python {tmp_venv}/bin/python "
             f"--python-platform {platform} "
@@ -103,6 +115,7 @@ async def sync_pylock(
             shell=True, check=True, capture_output=True, env=uv_env
         )
 
+        # Remove the temporary venv previously created
         subprocess.run(f"rm -rf {tmp_venv}", shell=True)
 
 

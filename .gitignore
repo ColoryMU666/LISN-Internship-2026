@@ -13,6 +13,22 @@ testFastAPI/dist/
 testFastAPI/wheels/
 testFastAPI/*.egg-info
 
+testJupyter/__pycache__/
+testJupyter/*.py[oc]
+testJupyter/build/
+testJupyter/dist/
+testJupyter/wheels/
+testJupyter/*.egg-info
+
+cacheSharingService/__pycache__/
+cacheSharingService/*.py[oc]
+cacheSharingService/build/
+cacheSharingService/dist/
+cacheSharingService/wheels/
+cacheSharingService/*.egg-info
+
 # Virtual environments
 testDocker/.venv
 testFastAPI/.venv
+testJupyter/.venv
+cacheSharingService/.venv

@@ -9,6 +9,6 @@ app = FastAPI()
 def hello():
     return {"message" : "Hello world"}
 
-@app.get("/")
+@app.get("/", response_class=RedirectResponse)
 def fn(git_url=""):
-    return{"url" : git_url}
+    return RedirectResponse(url="https://github.com/ColoryMU666/LISN-Internship-2026.git", status_code=302)

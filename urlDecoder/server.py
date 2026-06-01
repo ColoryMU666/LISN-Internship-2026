@@ -3,6 +3,7 @@ from fastapi.responses import RedirectResponse
 import os
 import socket
 import time
+import signal
 import subprocess
 
 app = FastAPI()
@@ -27,6 +28,7 @@ def hello():
 def fn(shared_cache=""):
     global jupyter_process
     if jupyter_process is None or jupyter_process.poll() is not None:
-        jupyter_process = subprocess.Popen("uv run --with nbgitpuller --with jupyterlab jupyter-lab --port 8080 --allow-root", shell=True)
+        jupyter_process = subprocess.Popen("uv run --with nbgitpuller --with jupyterlab jupyter-lab --port 8888 --allow-root", shell=True)
     wait_for_port(port=8080, timeout=30)
-    return "http://localhost:8080/lab"
+    os.kill(os.getpid(), signal.SIGTERM)
+    return "http://localhost:8888/lab"

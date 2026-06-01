@@ -25,12 +25,12 @@ def hello():
     return {"message" : "Hello world"}
 
 @app.get("/", response_class=RedirectResponse, status_code=302)
-def fn(shared_cache="", url="", token=""):
+def fn(shared_cache="", url="", token="", repo="", branch="main"):
     global jupyter_process
     if jupyter_process is None or jupyter_process.poll() is not None:
         jupyter_process = subprocess.Popen(f"uv run --with nbgitpuller --with jupyterlab jupyter-lab --ip 0.0.0.0 --port 8080 --IdentityProvider.token={token} --allow-root", shell=True)
     if wait_for_port(port=8080, timeout=30):
-        subprocess.run(f"echo {url}?token={token}", shell=True)
-        return f"{url}?token={token}"
+        subprocess.run(f"echo {url}/lab/hub/user-redirect/git-pull?token={token}&repo={repo}&branch={branch}", shell=True)
+        return f"{url}/lab/hub/user-redirect/git-pull?token={token}&repo={repo}&branch={branch}"
     else:
         {"error" : "Jupyterlab did not start in time"}

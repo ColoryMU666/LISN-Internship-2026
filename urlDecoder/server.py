@@ -27,9 +27,14 @@ def hello():
 @app.get("/", response_class=RedirectResponse, status_code=302)
 def fn(shared_cache="", url="", token="", repo="", branch="main"):
     global jupyter_process
+    buff = ""
+    i = len(repo)-1
+    while repo[i] != "/":
+        buff += repo[i]
+    buff = buff[::-1]
     if jupyter_process is None or jupyter_process.poll() is not None:
         jupyter_process = subprocess.Popen(f"uv run --with nbgitpuller --with jupyterlab jupyter-lab --ip 0.0.0.0 --port 8080 --IdentityProvider.token={token} --allow-root", shell=True)
     if wait_for_port(port=8080, timeout=30):
-        return f"{url}git-pull?token={token}&repo={repo}&branch={branch}"
+        return f"{url}git-pull?token={token}&repo={repo}&branch={branch}&urlPath=lab/tree/{buff}/"
     else:
         {"error" : "Jupyterlab did not start in time"}

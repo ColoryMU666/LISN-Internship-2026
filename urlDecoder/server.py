@@ -11,5 +11,5 @@ def hello():
 
 @app.get("/", response_class=RedirectResponse, status_code=302)
 def fn(shared_cache=""):
-    subprocess.run("uv run --with nbgitpuller --with jupyterlab jupyter-lab --port 8080", shell=True)
+    subprocess.run("uv run --with nbgitpuller --with jupyterlab jupyter-lab --port 8080 --allow-root", shell=True)
     return "http://localhost:8080/lab"

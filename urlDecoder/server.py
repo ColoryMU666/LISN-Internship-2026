@@ -28,7 +28,7 @@ def hello():
 def fn(shared_cache="", url=""):
     global jupyter_process
     if jupyter_process is None or jupyter_process.poll() is not None:
-        jupyter_process = subprocess.Popen("uv run --with nbgitpuller --with jupyterlab jupyter-lab --port 8080 --allow-root", shell=True)
+        jupyter_process = subprocess.Popen("uv run --with nbgitpuller --with jupyterlab jupyter-lab --ip 0.0.0.0 --port 8080 --allow-root", shell=True)
     if wait_for_port(port=8080, timeout=30):
         return url
     else:

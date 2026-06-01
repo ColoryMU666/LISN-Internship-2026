@@ -5,7 +5,7 @@ import subprocess
 
 app = FastAPI()
 
-@app.post("/hello/")
+@app.get("/hello/")
 def hello():
     return {"message" : "Hello world"}
 

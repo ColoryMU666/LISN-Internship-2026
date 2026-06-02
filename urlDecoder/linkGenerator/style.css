@@ -33,21 +33,6 @@ input {
     line-height: 1.5;
 }
 
-.invite-section {
-    margin: 8px 0 12px;
-}
-
-.invite-section label {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.95rem;
-}
-
-#inviteInput {
-    margin-top: 8px;
-}
-
 button {
     border: none;
     border-radius: 8px;

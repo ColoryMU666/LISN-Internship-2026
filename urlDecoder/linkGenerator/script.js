@@ -2,31 +2,23 @@ const gitInput = document.querySelector('input[name="git_url"]');
 const branchInput = document.querySelector('input[name="branch"]');
 const log = document.getElementById('log');
 const copyLogBtn = document.getElementById('copylogbtn');
-const inviteToggle = document.getElementById('inviteToggle');
-const inviteInput = document.getElementById('inviteInput');
 
 function updateLog() {
     const git = gitInput ? gitInput.value.trim() : '';
     const branch = branchInput ? branchInput.value.trim() : '';
-    const defaultBeginning = 'https://{{HOST["8888"]}}/';
+    const base = 'https://{{HOST["8888"]}}/';
 
-    // Build query parameters
-    const params = [];
+    // Build query parameters - always include url and token
+    const params = [
+        `url=https://{{HOST["8080"]}}/`,
+        `token={{PASSWORD}}`
+    ];
     if (git) params.push(`repo=${encodeURIComponent(git)}`);
     if (branch) params.push(`branch=${encodeURIComponent(branch)}`);
-    const queryString = params.length > 0 ? `?${params.join('&')}` : '';
-
-    // Determine base URL
-    let base = defaultBeginning;
-    if (inviteToggle && inviteToggle.checked && inviteInput && inviteInput.value.trim()) {
-        // use the invitation base and append /user-redirect/
-        let inviteBase = inviteInput.value.trim();
-        // remove trailing slashes
-        inviteBase = inviteBase.replace(/\/+$/, '');
-        base = inviteBase + '/user-redirect/';
-    }
-
+    
+    const queryString = `?${params.join('&')}`;
     const urlText = `${base}${queryString}`;
+    
     if (log) {
         log.textContent = urlText;
     }
@@ -84,16 +76,6 @@ if (copyLogBtn) {
 
 if (gitInput) gitInput.addEventListener('input', updateLog);
 if (branchInput) branchInput.addEventListener('input', updateLog);
-if (inviteToggle) {
-    inviteToggle.addEventListener('change', () => {
-        if (inviteInput) {
-            inviteInput.style.display = inviteToggle.checked ? 'block' : 'none';
-            if (!inviteToggle.checked) inviteInput.value = '';
-        }
-        updateLog();
-    });
-}
-if (inviteInput) inviteInput.addEventListener('input', updateLog);
 
 // initialize display
 updateLog();

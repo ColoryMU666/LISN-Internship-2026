@@ -8,8 +8,18 @@ from typing import Optional
 app = FastAPI()
 info = ["a"] # Pointeur python
 
+def get_uv_cache_path():
+    if os.path.exists("cacheloc.txt"):
+        subprocess.run("rm cacheloc.txt", shell=True)
+    subprocess.run("echo `uv cache dir` > cacheloc.txt", shell=True)
+    file = open("cacheloc.txt", "r")
+    for l in file:
+        res = l
+    subprocess.run("rm cacheloc.txt", shell=True)
+    return res
+
 BASE_DIR = os.getcwd()
-UV_CACHE_DIR = os.path.expanduser("~/.cache/uv")
+UV_CACHE_DIR = get_uv_cache_path()
 uv_env = {**os.environ, "UV_CACHE_DIR": UV_CACHE_DIR}
 
 def get_installed_packages() -> dict[str, str]:

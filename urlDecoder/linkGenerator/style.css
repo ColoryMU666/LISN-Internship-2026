@@ -29,6 +29,8 @@ input {
     background: #eef2ff;
     color: #111827;
     white-space: pre-wrap;
+    word-break: break-word;
+    overflow-wrap: break-word;
     min-height: 3rem;
     line-height: 1.5;
 }

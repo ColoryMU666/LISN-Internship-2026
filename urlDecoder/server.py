@@ -25,7 +25,7 @@ def hello():
     return {"message" : "Hello world"}
 
 @app.get("/", response_class=RedirectResponse, status_code=302)
-def fn(request : Request ,shared_cache="", url="", token="", repo="", branch="main"):
+def fn(request : Request ,shared_cache="", url="", token="", repo="", branch="main", urlPath=""):
     global jupyter_process
     can_return = True
     try:
@@ -45,8 +45,10 @@ def fn(request : Request ,shared_cache="", url="", token="", repo="", branch="ma
     else:
         return str(request.url)
 
-    if can_return:
+    if can_return and urlPath == "":
         return f"{url}git-pull?token={token}&repo={repo}&branch={branch}&urlPath=lab/tree/{buff}/"
+    elif can_return:
+        return f"{url}git-pull?token={token}&repo={repo}&branch={branch}&urlPath={urlPath}"
 
 @app.get("/debug/")
 def fn(shared_cache="", url="", token="", repo="", branch="main"):

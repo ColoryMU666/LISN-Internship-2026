@@ -1,11 +1,18 @@
 const gitInput = document.querySelector('input[name="git_url"]');
 const branchInput = document.querySelector('input[name="branch"]');
+const fileInput = document.querySelector('input[name="file"]');
 const log = document.getElementById('log');
 const copyLogBtn = document.getElementById('copylogbtn');
+
+function getRepoName(gitUrl) {
+    const cleanUrl = gitUrl.replace(/\/+$/, '');
+    return cleanUrl.split('/').pop() || '';
+}
 
 function updateLog() {
     const git = gitInput ? gitInput.value.trim() : '';
     const branch = branchInput ? branchInput.value.trim() : '';
+    const file = fileInput ? fileInput.value.trim() : '';
     const base = `https://{{HOST['8888']}}/`;
 
     // Build query parameters - always include url and token
@@ -13,7 +20,14 @@ function updateLog() {
         `url=https://{{HOST['8080']}}/`,
         `token={{PASSWORD}}`
     ];
-    if (git) params.push(`repo=${encodeURIComponent(git)}`);
+    if (git) {
+        params.push(`repo=${encodeURIComponent(git)}`);
+        const repoName = getRepoName(git);
+        if (repoName) {
+            const path = file ? `lab/tree/${repoName}/${file}` : `lab/tree/${repoName}`;
+            params.push(`urlPath=${encodeURIComponent(path)}`);
+        }
+    }
     if (branch) params.push(`branch=${encodeURIComponent(branch)}`);
     
     const queryString = `?${params.join('&')}`;
@@ -76,6 +90,7 @@ if (copyLogBtn) {
 
 if (gitInput) gitInput.addEventListener('input', updateLog);
 if (branchInput) branchInput.addEventListener('input', updateLog);
+if (fileInput) fileInput.addEventListener('input', updateLog);
 
 // initialize display
 updateLog();

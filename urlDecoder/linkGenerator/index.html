@@ -7,13 +7,30 @@
         <link rel="stylesheet" href="style.css">
     </head>
     <body>
-        <h1>
-            Link generator
-        </h1>
-        <input placeholder="Enter git url" name="git_url">
-        <input placeholder="Select branch" name="branch">
-        <label id="log" aria-live="polite">URL will appear here</label>
-        <button id="copylogbtn" type="button">Copy</button>
+        <main class="page-shell">
+            <section class="card">
+                <h1>Link generator</h1>
+                <p class="description">Generate a launcher URL from a Git repository, optional branch, and optional file path.</p>
+
+                <form class="link-form" onsubmit="return false;" autocomplete="off">
+                    <label for="git_url">Git repository URL</label>
+                    <input id="git_url" name="git_url" placeholder="Enter git url">
+
+                    <label for="branch">Branch</label>
+                    <input id="branch" name="branch" placeholder="Select branch">
+
+                    <label for="file">File to open (optional)</label>
+                    <input id="file" name="file" placeholder="File to open after checkout">
+                </form>
+
+                <div class="output-panel">
+                    <div class="output-label">Generated URL</div>
+                    <pre id="log" aria-live="polite">URL will appear here</pre>
+                </div>
+
+                <button id="copylogbtn" type="button">Copy URL</button>
+            </section>
+        </main>
         <!-- To test with TypeScript, compile script.ts to script.js and use the generated file. -->
         <!-- <script type="module" src="script.ts"></script> -->
         <script type="text/javascript" src="script.js"></script>

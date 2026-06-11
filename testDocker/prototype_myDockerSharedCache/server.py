@@ -3,16 +3,37 @@ from fastapi.responses import HTMLResponse
 import shutil
 import os
 import subprocess
+import shlex
+import re
+import tempfile
 from typing import Optional
 
+PLATFORM_RE = re.compile(r'^[a-zA-Z0-9_\-\.]+$')
+VERSION_RE  = re.compile(r'^\d+\.\d+(\.\d+)?$')
+
 app = FastAPI()
-info = ["a"]
+
+def validate_param(value: str, pattern: re.Pattern, name: str) -> str:
+    if not pattern.match(value):
+        raise HTTPException(status_code=400, detail=f"Invalid {name}")
+    return value
+
+def get_uv_cache_path():
+    res = subprocess.run(
+        ["uv", "cache", "dir"],
+        check=True, capture_output=True, text=True
+    ).stdout.strip()
+    return res
 
 BASE_DIR = os.getcwd()
-UV_CACHE_DIR = os.path.expanduser("~/.cache/uv")
+UV_CACHE_DIR = get_uv_cache_path()
 uv_env = {**os.environ, "UV_CACHE_DIR": UV_CACHE_DIR}
 
-def get_installed_packages():
+def get_installed_packages() -> dict[str, str]:
+    '''
+    This function parse the pylock.toml file in the current directory and return a dictionnary where the
+    keys are the name of the package needed and the values are their version.
+    '''
     readName = False
     reading = False
     name = ""
@@ -34,6 +55,8 @@ def get_installed_packages():
     file.close()
     return res
 
+
+#Creates a button on the home page to access the information page.
 @app.get("/", response_class=HTMLResponse)
 async def root():
     return """
@@ -51,65 +74,71 @@ async def root():
 async def helloWorld():
     return "Hello world"
 
-# Change the two following function to support several demands at the same time. Currently if 
-# A, B and C asks for their env and the info request is processed quicker than the upload request 
-# the created venv for B will be named venv_C. It's not much of a problem but it would be better 
-# for clarity and debugging purpose if the venv always have the name of the machinie who requested it.
-@app.post("/info/")
-async def set_info(file: UploadFile):
-    content = await file.read()
-    info[0] = content.decode('utf-8').strip()
-    return
-
+#This function is temporary and should soon be replaced 
 @app.get("/info/")
 async def get_info():
-    return get_installed_packages()
-
+    try :
+        return get_installed_packages()
+    except OSError as e:
+        print(e.args[0])
+        return e.args[1]
+    
+# Consider creating something like an API key to avoid anyone to be able to upload a lockfile and make the server download packages on it, which could be a security issue.
+# Also add a verification that the uploaded file is indeed a lockfile and not something else, to avoid any potential security issue.
+# For now, we just check that the filename is valid and that it is located in the current directory, but it would be better to check its content as well.
 @app.post("/upload/")
 async def sync_pylock(
     file: UploadFile,
+    hostname: Optional[str] = Form(default="default_host"),
     platform: Optional[str] = Form(default="x86_64-unknown-linux-gnu"),
     python_version: Optional[str] = Form(default="3.14")
 ):
-    local_file_path = os.path.join(BASE_DIR, file.filename)
+    with tempfile.TemporaryDirectory() as tmpdir:
 
-    try:
-        with open(local_file_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
+        local_file_path = os.path.join(tmpdir, "pylock.toml")
+        platform = validate_param(platform, PLATFORM_RE, "platform")
+        python_version = validate_param(python_version, VERSION_RE, "python_version")
+        safe_hostname = validate_param(hostname, re.compile(r'^[a-zA-Z0-9_\-]+$'), "hostname")
+        tmp_venv = os.path.join(tmpdir, f"venv_{safe_hostname}")
 
-        tmp_venv = f"/tmp/venv_{info[0].strip()}"
-        subprocess.run(
-            f"uv venv --python 3.14 {tmp_venv}",
-            shell=True, check=True, env=uv_env, capture_output=True
-        )
+        try:
+            # Copy the content of the posted lockfile into a brand new lockfile in the current directory
+            with open(local_file_path, "wb") as buffer:
+                shutil.copyfileobj(file.file, buffer)
 
-        # Passe 1 : télécharger et indexer les sdists nativement
-        subprocess.run(
-            f"uv pip install --python {tmp_venv}/bin/python "
-            f"--link-mode=copy "
-            f"-r pylock.toml",
-            shell=True, check=True, capture_output=True, env=uv_env
-        )
+            # Creating the temporary venv in which we will be downloading every needed packages
+            subprocess.run(
+                ["uv", "venv", "--python", python_version, tmp_venv],
+                check=True, env=uv_env, capture_output=True
+            )
 
-        # Passe 2 : installer pour la plateforme cible
-        subprocess.run(
-            f"uv pip install --python {tmp_venv}/bin/python "
-            f"--python-platform {platform} "
-            f"--python-version {python_version} "
-            f"--link-mode=copy "
-            f"--reinstall "
-            f"-r pylock.toml",
-            shell=True, check=True, capture_output=True, env=uv_env
-        )
+            # Step 1 : Downloading and indexing the sdist
+            subprocess.run(
+                ["uv", "pip", "install",
+                 "--python", f"{tmp_venv}/bin/python",
+                 "--link-mode=copy",
+                 "-r", local_file_path],
+                check=True, env=uv_env, capture_output=True
+            )
 
-        subprocess.run(f"rm -rf {tmp_venv}", shell=True)
+            # Step 2 : Installing for the target platform
+            subprocess.run(
+                ["uv", "pip", "install",
+                 "--python", f"{tmp_venv}/bin/python",
+                 "--python-platform", platform,
+                 "--python-version", python_version,
+                 "--link-mode=copy",
+                 "--reinstall",
+                 "-r", local_file_path],
+                check=True, env=uv_env, capture_output=True
+            )
 
 
-    except subprocess.CalledProcessError as e:
-        stderr = e.stderr.decode() if e.stderr else "no stderr"
-        stdout = e.stdout.decode() if e.stdout else "no stdout"
-        raise HTTPException(status_code=500, detail=f"stderr: {stderr}\nstdout: {stdout}")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        except subprocess.CalledProcessError as e:
+            stderr = e.stderr.decode() if e.stderr else "no stderr"
+            stdout = e.stdout.decode() if e.stdout else "no stdout"
+            raise HTTPException(status_code=500, detail=f"stderr: {stderr}\nstdout: {stdout}")
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
 
-    return "/tmp/tosend.zip"
+    return "Done"

@@ -8,7 +8,6 @@ def request(lockfile):
 
     try:
         url = f"{sys.argv[1]}upload/"
-        urlInfo = f"{sys.argv[1]}info/"
     except:
         raise IndexError("The link to the server was not given")
 
@@ -30,10 +29,8 @@ def request(lockfile):
     }
     target_platform = platform_map.get(machine, "x86_64-unknown-linux-gnu")
 
-    infos = {'file': open('info.txt', 'r')}
-
-    requests.post(urlInfo, files=infos)
     response = requests.post(url, files=lockfile, data={
+        "hostname": info,
         "platform": target_platform,
         "python_version": "3.14"
     })

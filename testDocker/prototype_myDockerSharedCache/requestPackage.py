@@ -16,11 +16,6 @@ def request(lockfile):
     info = fileinfo.read()
     fileinfo.close()
 
-    if not os.path.isfile("info.txt"):
-        file = open("info.txt", "a")
-        file.write(info)
-        file.close()
-
     machine = platform.machine()
     platform_map = {
         "x86_64": "x86_64-unknown-linux-gnu",

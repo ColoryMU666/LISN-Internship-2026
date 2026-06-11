@@ -13,7 +13,7 @@ from typing import Optional
 PLATFORM_RE = re.compile(r'^[a-zA-Z0-9_\-\.]+$')
 VERSION_RE  = re.compile(r'^\d+\.\d+(\.\d+)?$')
 MAX_LOCKFILE_SIZE = 1 * 1024 * 1024  # 1 MB
-ALLOWED_HOST = "files.pythonhoster.org"
+ALLOWED_HOST = "files.pythonhosted.org"
 
 app = FastAPI()
 
@@ -28,6 +28,12 @@ def validate_lockfile(content: bytes) -> None:
     
     for package in data["packages"]:
         name = package.get("name", "<unknown>")
+
+        if "vcs" in package:
+            raise HTTPException(status_code=400, detail=f"VCS dependencies are not allowed (package '{name}')")
+
+        if "path" in package:
+            raise HTTPException(status_code=400, detail=f"Local path dependencies are not allowed (package '{name}')")
 
         for wheel in package.get("wheels", []):
             _check_url(wheel.get("url", ""), name)

@@ -1,6 +1,7 @@
 import subprocess
 import os
 import requestPackage
+from fastapi import FastAPI, HTTPException
 
 VENV_LOCATION = "/tmp/venv/"
 BASE_DIR = os.getcwd()
@@ -31,8 +32,11 @@ def main():
 if __name__=="__main__":
     try:
         main()
-    except:
+    except KeyboardInterrupt:
         subprocess.run("uv lock", shell=True)
         subprocess.run("rm -rf ./*", shell=True)
         os.chdir(f"{BASE_DIR}")
         print("Ending process properly")
+    except HTTPException as e:
+        subprocess.run("rm -rf ./*", shell=True)
+        print(f"Error : {e.detail}")

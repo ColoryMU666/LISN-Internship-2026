@@ -30,6 +30,9 @@ def request(lockfile):
         "python_version": "3.14"
     })
 
+    if response.status_code != 200:
+        return
+
     print(response.text)
 
     subprocess.run("uv sync --offline", shell=True, check=True)

@@ -1,2 +1,2 @@
 read -p "Enter server url: " url
-uv run --with requests python main.py "$url"
+uv run --with requests --with fastapi main.py "$url"

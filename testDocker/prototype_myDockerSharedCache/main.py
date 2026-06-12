@@ -18,7 +18,7 @@ def main():
             stop = True
         else:
             try:
-                subprocess.run(f"uv add {requestedPackage}", shell=True)
+                subprocess.run(f"uv add {requestedPackage}", shell=True, check=True)
             except subprocess.CalledProcessError as e:
                 stderr = e.stderr.decode() if e.stderr else "no stderr"
                 stdout = e.stdout.decode() if e.stdout else "no stdout"

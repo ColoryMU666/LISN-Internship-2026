@@ -19,6 +19,8 @@ def main():
         else:
             try:
                 subprocess.run(f"uv add {requestedPackage}", shell=True, check=True)
+            except ValueError as e:
+                print(f"Error : {e}")
             except subprocess.CalledProcessError as e:
                 stderr = e.stderr.decode() if e.stderr else "no stderr"
                 stdout = e.stdout.decode() if e.stdout else "no stdout"
@@ -32,11 +34,8 @@ def main():
 if __name__=="__main__":
     try:
         main()
-    except KeyboardInterrupt:
+    except Exception as e:
+        print(f"Ending process: {e}")
         subprocess.run("uv lock", shell=True)
         subprocess.run("rm -rf ./*", shell=True)
         os.chdir(f"{BASE_DIR}")
-        print("Ending process properly")
-    except HTTPException as e:
-        subprocess.run("rm -rf ./*", shell=True)
-        print(f"Error : {e.detail}")

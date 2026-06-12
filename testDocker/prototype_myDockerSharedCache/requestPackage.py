@@ -25,13 +25,12 @@ def request(lockfile):
     target_platform = platform_map.get(machine, "x86_64-unknown-linux-gnu")
 
     response = requests.post(url, files=lockfile, data={
-        "hostname": info,
-        "platform": target_platform,
-        "python_version": "3.14"
-    })
-
+             "hostname": info,
+            "platform": target_platform,
+            "python_version": "3.14"
+        })
     if response.status_code != 200:
-        return
+        raise ValueError(f"Server rejected the request ({response.status_code}): {response.text}")
 
     print(response.text)
 

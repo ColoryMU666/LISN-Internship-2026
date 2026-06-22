@@ -25,8 +25,9 @@ def hello():
     return {"message" : "Hello world"}
 
 @app.get("/", response_class=RedirectResponse, status_code=302)
-def fn(request : Request ,shared_cache="", url="", token="", ressourceRepo="", ressourceBranch="main", urlPath="", envRepo="", envBranch="master"):
+def fn(request : Request ,shared_cache="", url="", token="", ressourceRepo="", ressourceBranch="main", urlPath="", envRepo="https://gitlab.dsi.universite-paris-saclay.fr/matthieu.urios/uvEnvironmentBuilder", envBranch="main"):
     print(f"DEBUG envRepo={repr(envRepo)}")
+    print(f"DEBUG envBranch={repr(envBranch)}")
     global jupyter_process
     can_return = True
     try:

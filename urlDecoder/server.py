@@ -26,6 +26,7 @@ def hello():
 
 @app.get("/", response_class=RedirectResponse, status_code=302)
 def fn(request : Request ,shared_cache="", url="", token="", ressourceRepo="", ressourceBranch="main", urlPath="", envRepo="", envBranch="main"):
+    print(f"DEBUG envRepo={repr(envRepo)}")
     global jupyter_process
     can_return = True
     try:

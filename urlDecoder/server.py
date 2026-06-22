@@ -60,21 +60,9 @@ def fn(request : Request):
     elif can_return:
         return f"{url}git-pull?token={token}&repo={ressourceRepo}&branch={ressourceBranch}&urlPath={urlPath}"
 
-@app.get("/debug/")
-def fn(shared_cache="", url="", token="", repo="", branch="main"):
-    global jupyter_process
-    buff = ""
-    cpt = 0
-    i = len(repo)-1
-    while repo[i] != "/":
-        cpt += 1
-        buff += repo[i]
-        i -= 1
-    buff = buff[::-1]
-    if jupyter_process is None or jupyter_process.poll() is not None:
-        jupyter_process = subprocess.Popen(f"uv run --with nbgitpuller --with jupyterlab jupyter-lab --ip 0.0.0.0 --port 8080 --IdentityProvider.token={token} --allow-root", shell=True)
-    if wait_for_port(port=8080, timeout=30):
-        pass
-    else:
-        return {"error" : "Jupyterlab did not start in time"}
-    return {"buffer" : buff , "count" : cpt, "url" : f"{url}git-pull?token={token}&repo={repo}&branch={branch}&urlPath=lab/tree/{buff}/"}
+@app.get("/debug/", response_class=RedirectResponse, status_code=302)
+def fn(request: Request):
+    print("RAW URL:", request.url)
+    print("PARAMS:", dict(request.query_params))
+    
+    

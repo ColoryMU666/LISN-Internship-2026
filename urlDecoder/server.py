@@ -25,9 +25,17 @@ def hello():
     return {"message" : "Hello world"}
 
 @app.get("/", response_class=RedirectResponse, status_code=302)
-def fn(request : Request ,shared_cache="", url="", token="", envRepo="", envBranch="main", ressourceRepo="", ressourceBranch="main", urlPath=""):
-    print(f"DEBUG envRepo={repr(envRepo)}")
-    print(f"DEBUG envBranch={repr(envBranch)}")
+def fn(request : Request):
+    params = request.query_params
+    
+    url = params.get("url", "")
+    token = params.get("token", "")
+    envRepo = params.get("envRepo", "")
+    envBranch = params.get("envBranch", "main")
+    ressourceRepo = params.get("ressourceRepo", "")
+    ressourceBranch = params.get("ressourceBranch", "main")
+    urlPath = params.get("urlPath", "")
+
     global jupyter_process
     can_return = True
     try:

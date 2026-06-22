@@ -25,7 +25,7 @@ def hello():
     return {"message" : "Hello world"}
 
 @app.get("/", response_class=RedirectResponse, status_code=302)
-def fn(request : Request ,shared_cache="", url="", token="", ressourceRepo="", ressourceBranch="main", urlPath="", envRepo="", envBranch="main"):
+def fn(request : Request ,shared_cache="", url="", token="", ressourceRepo="", ressourceBranch="main", urlPath="", envRepo="", envBranch="master"):
     print(f"DEBUG envRepo={repr(envRepo)}")
     global jupyter_process
     can_return = True

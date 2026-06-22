@@ -30,7 +30,7 @@ def fn(request : Request):
     
     url = params.get("url", "")
     token = params.get("token", "")
-    envRepo = params.get("envRepo", "")
+    envRepo = params.get("envRepo", "https://gitlab.dsi.universite-paris-saclay.fr/matthieu.urios/uvEnvironmentBuilder")
     envBranch = params.get("envBranch", "main")
     ressourceRepo = params.get("ressourceRepo", "")
     ressourceBranch = params.get("ressourceBranch", "main")
@@ -47,8 +47,8 @@ def fn(request : Request):
         buff = buff[::-1]
     except IndexError:
         can_return = False
-    #if jupyter_process is None or jupyter_process.poll() is not None:
-    jupyter_process = subprocess.Popen(f"uv run --with \"git+{envRepo}@{envBranch}\" --with nbgitpuller --with jupyterlab jupyter-lab --ip 0.0.0.0 --port 8080 --IdentityProvider.token={token} --allow-root", shell=True)
+    if jupyter_process is None or jupyter_process.poll() is not None:
+        jupyter_process = subprocess.Popen(f"uv run --with \"git+{envRepo}@{envBranch}\" --with nbgitpuller --with jupyterlab jupyter-lab --ip 0.0.0.0 --port 8080 --IdentityProvider.token={token} --allow-root", shell=True)
 
     if wait_for_port(port=8080, timeout=30):
         pass

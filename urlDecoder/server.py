@@ -25,20 +25,20 @@ def hello():
     return {"message" : "Hello world"}
 
 @app.get("/", response_class=RedirectResponse, status_code=302)
-def fn(request : Request ,shared_cache="", url="", token="", repo="", branch="main", urlPath=""):
+def fn(request : Request ,shared_cache="", url="", token="", ressourceRepo="", ressourceBranch="main", urlPath="", envRepo="", envBranch="main"):
     global jupyter_process
     can_return = True
     try:
         buff = ""
-        i = len(repo)-1
-        while repo[i] != "/":
-            buff += repo[i]
+        i = len(ressourceRepo)-1
+        while ressourceRepo[i] != "/":
+            buff += ressourceRepo[i]
             i -= 1
         buff = buff[::-1]
     except IndexError:
         can_return = False
     if jupyter_process is None or jupyter_process.poll() is not None:
-        jupyter_process = subprocess.Popen(f"uv run --with nbgitpuller --with jupyterlab jupyter-lab --ip 0.0.0.0 --port 8080 --IdentityProvider.token={token} --allow-root", shell=True)
+        jupyter_process = subprocess.Popen(f"uv run --with git+{envRepo}@{envBranch} --with nbgitpuller --with jupyterlab jupyter-lab --ip 0.0.0.0 --port 8080 --IdentityProvider.token={token} --allow-root", shell=True)
 
     if wait_for_port(port=8080, timeout=30):
         pass
@@ -46,9 +46,9 @@ def fn(request : Request ,shared_cache="", url="", token="", repo="", branch="ma
         return str(request.url)
 
     if can_return and urlPath == "":
-        return f"{url}git-pull?token={token}&repo={repo}&branch={branch}&urlPath=lab/tree/{buff}/"
+        return f"{url}git-pull?token={token}&repo={ressourceRepo}&branch={ressourceBranch}&urlPath=lab/tree/{buff}/"
     elif can_return:
-        return f"{url}git-pull?token={token}&repo={repo}&branch={branch}&urlPath={urlPath}"
+        return f"{url}git-pull?token={token}&repo={ressourceRepo}&branch={ressourceBranch}&urlPath={urlPath}"
 
 @app.get("/debug/")
 def fn(shared_cache="", url="", token="", repo="", branch="main"):

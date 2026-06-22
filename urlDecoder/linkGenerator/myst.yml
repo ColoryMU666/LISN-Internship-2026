@@ -1,0 +1,12 @@
+# See docs at: https://mystmd.org/guide/frontmatter
+version: 1
+project:
+  id: efdaf3be-8f08-451b-a96f-ace7a0dbeb5e
+  toc:
+    - file: link-generator.md
+  plugins:
+    - plugins/link-generator.mjs
+site:
+  template: book-theme
+  options:
+    favicon: favicon.ico

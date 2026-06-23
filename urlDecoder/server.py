@@ -42,8 +42,13 @@ def fn(request : Request):
         subprocess.run("rm -rf tmp", shell=True)
     os.mkdir("tmp")
     subprocess.run(f"git clone --branch {envBranch} {envRepo} tmp/env", shell=True)
+    if os.path.exists("tmp/env/pyproject.toml"):
+        subprocess.run(f"uv sync", shell=True)
     if os.path.exists("tmp/env/requirements.txt"):
         subprocess.run(f"uv pip install -r tmp/env/requirements.txt", shell=True)
+    if os.path.exists("tmp/env/environment.yml"):
+        subprocess.run(f"pixi init --import tmp/env/environment.yml", shell=True)
+        subprocess.run(f"pixi install", shell=True)
 
     can_return = True
     try:

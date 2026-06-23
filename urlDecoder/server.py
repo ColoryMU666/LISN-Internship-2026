@@ -26,8 +26,6 @@ def hello():
 
 @app.get("/launchJL/", response_class=RedirectResponse, status_code=302)
 def fn(request : Request):
-    print("RAW URL:", request.url)
-    print("PARAMS:", dict(request.query_params))
     params = request.query_params
     
     url = params.get("url", "")
@@ -37,12 +35,6 @@ def fn(request : Request):
     ressourceRepo = params.get("ressourceRepo", "")
     ressourceBranch = params.get("ressourceBranch", "main")
     urlPath = params.get("urlPath", "")
-
-    print("\n")
-    print("\n")
-    print(envRepo + "@" + envBranch)
-    print("\n")
-    print("\n")
 
     global jupyter_process
     can_return = True

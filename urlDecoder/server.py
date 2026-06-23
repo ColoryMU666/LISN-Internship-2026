@@ -26,15 +26,23 @@ def hello():
 
 @app.get("/", response_class=RedirectResponse, status_code=302)
 def fn(request : Request):
+    print("RAW URL:", request.url)
+    print("PARAMS:", dict(request.query_params))
     params = request.query_params
     
     url = params.get("url", "")
     token = params.get("token", "")
-    envRepo = params.get("envRepo", "https://gitlab.dsi.universite-paris-saclay.fr/matthieu.urios/uvEnvironmentBuilder")
+    envRepo = params.get("envRepo", "")
     envBranch = params.get("envBranch", "main")
     ressourceRepo = params.get("ressourceRepo", "")
     ressourceBranch = params.get("ressourceBranch", "main")
     urlPath = params.get("urlPath", "")
+
+    print("\n")
+    print("\n")
+    print(envRepo + "@" + envBranch)
+    print("\n")
+    print("\n")
 
     global jupyter_process
     can_return = True

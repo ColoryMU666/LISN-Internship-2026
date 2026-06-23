@@ -38,6 +38,8 @@ def fn(request : Request):
 
     global jupyter_process
 
+    if os.path.exists("tmp"):
+        subprocess.run("rm -rf tmp", shell=True)
     os.mkdir("tmp")
     subprocess.run(f"git clone --branch {envBranch} {envRepo} tmp/env", shell=True)
     if os.path.exists("tmp/env/requirements.txt"):

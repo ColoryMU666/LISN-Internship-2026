@@ -48,7 +48,7 @@ def fn(request : Request):
     except IndexError:
         can_return = False
     if jupyter_process is None or jupyter_process.poll() is not None:
-        jupyter_process = subprocess.Popen(f"uv run --with \"git+{envRepo}@{envBranch}\" --with nbgitpuller --with jupyterlab jupyter-lab --ip 0.0.0.0 --port 8080 --IdentityProvider.token={token} --allow-root", shell=True)
+        jupyter_process = subprocess.Popen(f"uv run --with \"git+{envRepo}@{envBranch}\" --with nbgitpuller --with jupyterlab jupyter-lab --ip 0.0.0.0 --port 8080 --IdentityProvider.token={token} --allow-root --no-browser", shell=True)
 
     if wait_for_port(port=8080, timeout=30):
         pass

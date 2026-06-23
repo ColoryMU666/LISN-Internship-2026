@@ -24,7 +24,7 @@ def wait_for_port(port : int, timeout : int = 30) -> bool:
 def hello():
     return {"message" : "Hello world"}
 
-@app.get("/lanchJL/", response_class=RedirectResponse, status_code=302)
+@app.get("/launchJL/", response_class=RedirectResponse, status_code=302)
 def fn(request : Request):
     print("RAW URL:", request.url)
     print("PARAMS:", dict(request.query_params))

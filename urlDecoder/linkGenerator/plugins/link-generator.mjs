@@ -210,6 +210,10 @@ function render({ model, el }) {
     return cleanUrl.split('/').pop() || '';
   }
 
+  function isValidUrl(value) {
+    return value.startsWith('http://') || value.startsWith('https://');
+  }
+
   function updateFieldState(wrapper, input, alwaysValid = false) {
     wrapper.classList.remove('valid', 'invalid');
     if (alwaysValid || input.value.trim().length > 0) {
@@ -229,9 +233,15 @@ function render({ model, el }) {
     const file = fileInput.value.trim();
     const base = `https://{{HOST['8888']}}/`;
 
-    updateFieldState(gitEnvWrapper, gitEnvInput, false);
+    const gitEnvValid = gitEnv.length > 0 && isValidUrl(gitEnv);
+    gitEnvWrapper.classList.remove('valid', 'invalid');
+    gitEnvWrapper.classList.add(gitEnvValid ? 'valid' : 'invalid');
+    gitEnvInput.setAttribute('aria-invalid', gitEnvValid ? 'false' : 'true');
     updateFieldState(gitEnvBranchWrapper, gitEnvBranchInput, true);
-    updateFieldState(gitWrapper, gitInput, true);
+    const gitValid = git.length === 0 || isValidUrl(git);
+    gitWrapper.classList.remove('valid', 'invalid');
+    gitWrapper.classList.add(gitValid ? 'valid' : 'invalid');
+    gitInput.setAttribute('aria-invalid', gitValid ? 'false' : 'true');
     updateFieldState(gitBranchWrapper, gitBranchInput, true);
     updateFieldState(fileWrapper, fileInput, true);
 

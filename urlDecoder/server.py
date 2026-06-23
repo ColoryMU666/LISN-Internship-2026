@@ -26,7 +26,6 @@ def hello():
 
 @app.get("/launchJL/", response_class=RedirectResponse, status_code=302)
 def fn(request : Request):
-    return "https://www.google.com"
     print("RAW URL:", request.url)
     print("PARAMS:", dict(request.query_params))
     params = request.query_params

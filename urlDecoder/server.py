@@ -43,10 +43,13 @@ def fn(request : Request):
     os.mkdir("tmp")
     subprocess.run(f"git clone --branch {envBranch} {envRepo} tmp/env", shell=True)
     if os.path.exists("tmp/env/pyproject.toml"):
+        print("Installing dependencies from pyproject.toml")
         subprocess.run(f"uv sync", shell=True)
     if os.path.exists("tmp/env/requirements.txt"):
+        print("Installing dependencies from requirements.txt")
         subprocess.run(f"uv pip install -r tmp/env/requirements.txt", shell=True)
     if os.path.exists("tmp/env/environment.yml"):
+        print("Installing dependencies from environment.yml")
         subprocess.run(f"pixi init --import tmp/env/environment.yml", shell=True)
         subprocess.run(f"pixi install", shell=True)
 

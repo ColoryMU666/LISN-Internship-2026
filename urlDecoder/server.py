@@ -38,7 +38,7 @@ def fn(request : Request):
 
     global jupyter_process
 
-    os.mkdir("tmp", exist_ok=True)
+    os.mkdir("tmp")
     subprocess.run(f"git clone --branch {envBranch} {envRepo} tmp/env", shell=True)
     if os.path.exists("tmp/env/requirements.txt"):
         subprocess.run(f"uv pip install -r tmp/env/requirements.txt", shell=True)

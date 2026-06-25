@@ -5,5 +5,5 @@ app =  FastAPI()
 
 @app.get("/", response_class=PlainTextResponse)
 def fn(request: Request):
-    return f"RAW URL: {request.url}\n PARAMS: {dict(request.query_params)}"
+    return f"RAW URL: {request.url}\nPARAMS: {dict(request.query_params)}"
      

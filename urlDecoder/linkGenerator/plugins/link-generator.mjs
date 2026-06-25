@@ -146,6 +146,45 @@ function render({ model, el }) {
         box-shadow: 0 10px 25px rgba(22, 163, 74, 0.18);
     }
     #lg-copylogbtn.copied:hover { background: #15803d; }
+    .lg-app-section {
+        display: grid;
+        gap: 10px;
+    }
+    .lg-app-options {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .lg-app-btn {
+        padding: 10px 20px;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        background: white;
+        color: #334155;
+        font-size: 0.95rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+    }
+    .lg-app-btn:hover {
+        border-color: #6366f1;
+        color: #4f46e5;
+    }
+    .lg-app-btn.selected {
+        border-color: #4f46e5;
+        background: #eef2ff;
+        color: #4f46e5;
+        font-weight: 600;
+    }
+    .lg-app-fields {
+        display: grid;
+        gap: 10px;
+        margin-top: 12px;
+    }
+    .lg-app-field-wrapper {
+        display: grid;
+        gap: 6px;
+    }
   `;
   el.appendChild(style);
 
@@ -191,6 +230,67 @@ function render({ model, el }) {
     </form>
   `;
   el.appendChild(container);
+
+  const apps = model.get('app').map(entry => Object.keys(entry)[0]);
+
+
+  function renderAppSelector(apps) {
+    const section = document.createElement('div');
+    section.className = 'lg-app-section';
+    section.innerHTML = `<div class="lg-output-label">Application</div>`;
+
+    const optionsDiv = document.createElement('div');
+    optionsDiv.className = 'lg-app-options';
+
+    const fieldsDiv = document.createElement('div');
+    fieldsDiv.className = 'lg-app-fields';
+
+    const appData = model.get('app');
+
+    apps.forEach((app, i) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.textContent = app;
+      btn.className = 'lg-app-btn';
+
+      btn.addEventListener('click', () => {
+        optionsDiv.querySelectorAll('.lg-app-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+
+        fieldsDiv.innerHTML = '';
+        const fields = appData[i][app];
+        fields.forEach(fieldEntry => {
+          const fieldKey = Object.keys(fieldEntry)[0];
+          const fieldDef = fieldEntry[fieldKey];
+
+          const wrapper = document.createElement('div');
+          wrapper.className = 'lg-app-field-wrapper';
+
+          const label = document.createElement('label');
+          label.textContent = fieldDef.title;
+
+          const input = document.createElement('input');
+          input.type = 'text';
+          input.value = fieldDef.default;
+          input.placeholder = fieldDef.tooltip;
+          input.title = fieldDef.tooltip;
+          input.dataset.key = fieldKey;
+
+          wrapper.appendChild(label);
+          wrapper.appendChild(input);
+          fieldsDiv.appendChild(wrapper);
+        });
+      });
+
+      optionsDiv.appendChild(btn);
+    });
+
+    section.appendChild(optionsDiv);
+    section.appendChild(fieldsDiv);
+    container.querySelector('.lg-link-form').appendChild(section);
+  }
+
+  renderAppSelector(apps);
 
   const gitEnvInput = container.querySelector('#lg-git_env_url');
   const gitEnvWrapper = gitEnvInput.closest('.lg-validated-input');

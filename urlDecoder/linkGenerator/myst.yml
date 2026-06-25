@@ -4,8 +4,12 @@ project:
   id: efdaf3be-8f08-451b-a96f-ace7a0dbeb5e
   toc:
     - file: link-generator.md
+    - file: test.md
   plugins:
     - plugins/link-generator.mjs
+  resources:
+    - config.yml
+    - placeholder.yml
 site:
   template: book-theme
   options:

@@ -185,6 +185,31 @@ function render({ model, el }) {
         display: grid;
         gap: 6px;
     }
+    .lg-mode-toggle {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+    .lg-mode-active {
+        padding: 10px 20px;
+        border: 2px solid #4f46e5;
+        border-radius: 12px;
+        background: #eef2ff;
+        color: #4f46e5;
+        font-size: 0.95rem;
+        font-weight: 600;
+        cursor: pointer;
+    }
+    .lg-mode-inactive {
+        padding: 10px 20px;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        background: white;
+        color: #334155;
+        font-size: 0.95rem;
+        font-weight: 500;
+        cursor: pointer;
+    }
   `;
   el.appendChild(style);
 
@@ -193,6 +218,16 @@ function render({ model, el }) {
   container.innerHTML = `
     <h2>Link generator</h2>
     <p class="lg-description">Generate a launcher URL from a Git repository, optional branch, and optional file path.</p>
+    <div class="lg-mode-toggle">
+      <button id="lg-mode-btn" type="button" class="lg-mode-inactive">Link for my docker courses config</button>
+      <button id="lg-mode-btn-invite" type="button" class="lg-mode-inactive">Invitation link to my docker</button>
+    </div>
+    <div id="lg-invitation-section" style="display:none;">
+      <div class="lg-output-label">Invitation link</div>
+      <div class="lg-validated-input">
+        <input id="lg-invitation-url" placeholder="https://..." required>
+      </div>
+    </div>
     <div class="lg-output-section">
       <div class="lg-output-label">Generated URL</div>
       <div class="lg-output-row">
@@ -232,6 +267,8 @@ function render({ model, el }) {
   el.appendChild(container);
 
   const apps = model.get('app').map(entry => Object.keys(entry)[0]);
+  let appFields = {};
+  let invitationMode = false;
 
 
   function renderAppSelector(apps) {
@@ -257,6 +294,7 @@ function render({ model, el }) {
         optionsDiv.querySelectorAll('.lg-app-btn').forEach(b => b.classList.remove('selected'));
         btn.classList.add('selected');
 
+        appFields = {};
         fieldsDiv.innerHTML = '';
         const fields = appData[i][app];
         fields.forEach(fieldEntry => {
@@ -276,10 +314,17 @@ function render({ model, el }) {
           input.title = fieldDef.tooltip;
           input.dataset.key = fieldKey;
 
+          input.addEventListener('input', () => {
+            appFields[fieldKey] = input.value;
+            updateLog();
+          });
+          appFields[fieldKey] = fieldDef.default;
+
           wrapper.appendChild(label);
           wrapper.appendChild(input);
           fieldsDiv.appendChild(wrapper);
         });
+        updateLog();
       });
 
       optionsDiv.appendChild(btn);
@@ -304,6 +349,29 @@ function render({ model, el }) {
   const fileWrapper = fileInput.closest('.lg-validated-input');
   const log = container.querySelector('#lg-log');
   const copyLogBtn = container.querySelector('#lg-copylogbtn');
+  const modeBtn = container.querySelector('#lg-mode-btn');
+  const modeBtnInvite = container.querySelector('#lg-mode-btn-invite');
+  const invitationSection = container.querySelector('#lg-invitation-section');
+  const invitationInput = container.querySelector('#lg-invitation-url');
+  const invitationWrapper = invitationInput.closest('.lg-validated-input');
+
+  modeBtn.addEventListener('click', () => {
+    invitationMode = false;
+    modeBtn.className = 'lg-mode-active';
+    modeBtnInvite.className = 'lg-mode-inactive';
+    invitationSection.style.display = 'none';
+    updateLog();
+  });
+
+  modeBtnInvite.addEventListener('click', () => {
+    invitationMode = true;
+    modeBtnInvite.className = 'lg-mode-active';
+    modeBtn.className = 'lg-mode-inactive';
+    invitationSection.style.display = 'block';
+    updateLog();
+  });
+
+  invitationInput.addEventListener('input', updateLog);
 
   function getRepoName(gitUrl) {
     const cleanUrl = gitUrl.replace(/\/+$/, '');
@@ -331,7 +399,10 @@ function render({ model, el }) {
     const git = gitInput.value.trim();
     const branch = gitBranchInput.value.trim();
     const file = fileInput.value.trim();
-    const base = `https://{{HOST['8888']}}/`;
+    const invitationUrl = invitationInput ? invitationInput.value.trim() : '';
+    const base = invitationMode && invitationUrl
+      ? `${invitationUrl}/user-redirect/launch`
+      : `https://{{HOST['8888']}}/`;
 
     const gitEnvValid = gitEnv.length > 0 && isValidUrl(gitEnv);
     gitEnvWrapper.classList.remove('valid', 'invalid');
@@ -344,6 +415,10 @@ function render({ model, el }) {
     gitInput.setAttribute('aria-invalid', gitValid ? 'false' : 'true');
     updateFieldState(gitBranchWrapper, gitBranchInput, true);
     updateFieldState(fileWrapper, fileInput, true);
+    const invitationUrlValid = invitationUrl.length > 0 && isValidUrl(invitationUrl);
+    invitationWrapper.classList.remove('valid', 'invalid');
+    invitationWrapper.classList.add(invitationUrlValid ? 'valid' : 'invalid');
+    invitationInput.setAttribute('aria-invalid', invitationUrlValid ? 'false' : 'true');
 
     const params = [
       `url=https://{{HOST['8080']}}/`,
@@ -362,6 +437,10 @@ function render({ model, el }) {
       }
       if (branch) params.push(`ressourceBranch=${encodeURIComponent(branch)}`);
     }
+    if (appFields.shutdown_timeout !== undefined)
+      params.push(`STO=${encodeURIComponent(appFields.shutdown_timeout)}`);
+    if (appFields.command !== undefined)
+      params.push(`launchCommand=${encodeURIComponent(appFields.command)}`);
 
     log.textContent = `${base}?${params.join('&')}`;
   }

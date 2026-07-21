@@ -1,19 +1,15 @@
 # See docs at: https://mystmd.org/guide/frontmatter
 version: 1
 project:
-  id: f1a478af-d975-46b4-a768-5feb5f3c13ca
-  plugins:
-    - https://cdn.jsdelivr.net/gh/flotpython/myst-jsonform@main/dist/jsonform.mjs
+  id: ec0771fa-9bae-43e4-96f7-f6adb6b25e0d
   # title:
   # description:
   # keywords: []
   # authors: []
   # github:
-  toc:
-  - file: main.md
+  # To autogenerate a Table of Contents, run "myst init --write-toc"
 site:
   template: book-theme
-  options:
+  # options:
   #   favicon: favicon.ico
   #   logo: site_logo.png
-    style: style.css

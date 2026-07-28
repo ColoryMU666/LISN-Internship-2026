@@ -16,6 +16,6 @@ RUN mkdir app/
 # remove message on initial login
 #RUN echo "" >/etc/motd
 
-ENTRYPOINT [""]
+#ENTRYPOINT [""]
 
 EXPOSE 8888
